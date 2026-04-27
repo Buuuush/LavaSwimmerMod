@@ -2,11 +2,11 @@
   "required": true,
   "package": "com.example.lavaswimmer.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [],
+  "mixins": [
+    "EntitySwimmingMixin"
+  ],
   "client": [
     "LavaFogModifierMixin",
-    "ClientPlayerSwimmingMixin",
-    "LivingEntityRenderSwimmingMixin",
     "LavaFluidRendererMixin",
     "LavaVisibilityMixin"
   ],

@@ -13,7 +13,8 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.Vec3d;
 
 public class LavaSwimHandler {
-    private static final double BASE_SWIM_BOOST = 0.2;  // x5 boost pour le sprint
+    private static final double HORIZONTAL_SPEED_MULTIPLIER = 2.0;  // Double la vitesse horizontale vanilla
+    private static final double DOWNWARD_GRAVITY_MULTIPLIER = 1.0 / 3.0; // Descend 3x plus lentement
 
     public static void init() {
         ServerTickEvents.START_SERVER_TICK.register(server -> {
@@ -42,15 +43,44 @@ public class LavaSwimHandler {
                 if (player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE)) {
                     player.fallDistance = 0;
                 }
+            }
+        });
 
-                // Ajoute un boost directionnel puissant pendant la nage sprint (x5)
-                if (player.isSprinting()) {
-                    Vec3d look = player.getRotationVector();
-                    double swimBoost = BASE_SWIM_BOOST * level;
-                    Vec3d velocity = player.getVelocity().add(look.multiply(swimBoost));
-                    player.setVelocity(velocity);
-                    player.velocityModified = true;
+        ServerTickEvents.END_SERVER_TICK.register(server -> {
+            RegistryEntryLookup<Enchantment> enchantmentLookup = server
+                    .getRegistryManager()
+                    .getOrThrow(RegistryKeys.ENCHANTMENT);
+
+            RegistryEntry<Enchantment> lavaSwimmerEntry = enchantmentLookup
+                    .getOptional(LavaSwimmerEnchantments.LAVA_SWIMMER)
+                    .orElse(null);
+
+            if (lavaSwimmerEntry == null) return;
+
+            for (PlayerEntity player : server.getPlayerManager().getPlayerList()) {
+                if (!player.isInLava()) continue;
+
+                int level = EnchantmentHelper.getEquipmentLevel(lavaSwimmerEntry, player);
+                if (level <= 0) continue;
+
+                // Récupère la vélocité actuelle
+                Vec3d currentVelocity = player.getVelocity();
+
+                // Double la vitesse horizontale par rapport à la vanilla
+                double newY = currentVelocity.y;
+                if (newY < 0) {
+                    // Réduit uniquement la chute, sans bloquer la montée
+                    newY = newY * DOWNWARD_GRAVITY_MULTIPLIER;
                 }
+
+                Vec3d velocity = new Vec3d(
+                        currentVelocity.x * HORIZONTAL_SPEED_MULTIPLIER,
+                        newY,
+                        currentVelocity.z * HORIZONTAL_SPEED_MULTIPLIER
+                );
+                
+                player.setVelocity(velocity);
+                player.velocityModified = true;
 
                 // === OXYGÈNE (identique à l'eau vanilla) ===
                 int currentAir = player.getAir();
