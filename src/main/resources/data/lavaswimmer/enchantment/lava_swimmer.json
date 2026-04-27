@@ -1,0 +1,19 @@
+{
+  "description": {
+    "translate": "enchantment.lavaswimmer.lava_swimmer"
+  },
+  "supported_items": "#minecraft:enchantable/foot_armor",
+  "slots": ["feet"],
+  "weight": 2,
+  "max_level": 3,
+  "min_cost": {
+    "base": 10,
+    "per_level_above_first": 8
+  },
+  "max_cost": {
+    "base": 30,
+    "per_level_above_first": 8
+  },
+  "anvil_cost": 4,
+  "effects": {}
+}

@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "lavaswimmer",
+  "version": "${version}",
+  "name": "Lava Swimmer",
+  "entrypoints": {
+    "main": [
+      "com.example.lavaswimmer.LavaSwimmerMod"
+    ]
+  },
+  "mixins": [
+    "lavaswimmer.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.17.3",
+    "fabric-api": "*",
+    "minecraft": "~1.21.10"
+  }
+}
